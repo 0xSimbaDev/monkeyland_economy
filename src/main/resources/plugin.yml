@@ -1,0 +1,20 @@
+name: MonkeylandEconomy
+version: '${version}'
+main: me.monkeyland.monkeylandeconomy.MonkeylandEconomy
+api-version: '1.20'
+authors: [0xSimbaDev]
+description: Advanced Economy for Minecraft Server
+softdepend: [PlaceholderAPI]
+commands:
+  monkeyland:
+    description: Main command for MonkeylandEconomy.
+    usage: /monkeyland <subcommand> [arguments]
+    aliases: [mle] # Optional: add a shorter alias for the command
+
+permissions:
+  monkeylandeconomy.admin:
+    description: Gives access to admin commands in MonkeylandEconomy.
+    default: op
+  monkeylandeconomy.user: # Add a user permission for basic commands
+    description: Allows access to basic MonkeylandEconomy commands.
+    default: true

@@ -1,0 +1,13 @@
+maxSupply:
+  GOLD: 1000000.0
+exchangeRates:
+  BRONZE: 0.001
+  COPPER: 0.01
+  SILVER: 0.1
+  GOLD: 1.0
+inflationRate: 0.0015  # Starting inflation rate (0.15% per day)
+inflationFactor: 1.0   # Initial inflation factor (no inflation yet)
+inflationCurveFactor: 2.0  # Initial inflation factor (no inflation yet)
+startingInflationRate: 0.0015
+targetInflationRate: 0.005
+players:
