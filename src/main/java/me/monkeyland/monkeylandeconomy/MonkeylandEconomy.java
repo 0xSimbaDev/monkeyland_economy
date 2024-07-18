@@ -106,7 +106,7 @@ public final class MonkeylandEconomy extends JavaPlugin implements Listener {
 
         // Schedule task to run daily
         // long inflationDelay = 20L * 60 * 60 * 24; // 24 hours in ticks
-        long inflationDelay = 20L * 10;
+        long inflationDelay = 20L * 60 * 60;
         inflationTask = getServer().getScheduler().runTaskTimer(this, this::adjustInflationAndExchangeRates, inflationDelay, inflationDelay);
 
         // Log initial values to console
