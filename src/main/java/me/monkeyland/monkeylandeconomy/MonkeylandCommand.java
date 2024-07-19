@@ -37,9 +37,6 @@ public class MonkeylandCommand implements CommandExecutor {
             case "bal":
                 handleBalanceCommand(player, args);
                 break;
-            case "set":
-                handleSetCommand(player, args);
-                break;
             case "add":
                 handleAddCommand(player, args);
                 break;
@@ -60,7 +57,6 @@ public class MonkeylandCommand implements CommandExecutor {
 
         if (player.hasPermission("monkeylandeconomy.admin")) {
             player.sendMessage(ChatColor.YELLOW + "/monkeyland info" + ChatColor.WHITE + " - View economy info.");
-            player.sendMessage(ChatColor.YELLOW + "/monkeyland set <player> <currency> <amount>" + ChatColor.WHITE + " - Set a player's balance.");
             player.sendMessage(ChatColor.YELLOW + "/monkeyland add <player> <currency> <amount>" + ChatColor.WHITE + " - Add to a player's balance.");
         }
     }
@@ -98,7 +94,10 @@ public class MonkeylandCommand implements CommandExecutor {
         player.sendMessage(ChatColor.GOLD + "Your " + currency + " Balance: " + ChatColor.WHITE + String.format("%.2f", balance));
     }
 
-    // Method for handling the /monkeyland set command
+    /**
+     * @deprecated Use the `/monkeyland add` command instead to modify player balances.
+     */
+    /* Method for handling the /monkeyland set command
     private void handleSetCommand(Player player, String[] args) {
         if (!player.hasPermission("monkeylandeconomy.admin")) {
             player.sendMessage(ChatColor.RED + "You don't have permission to use this command.");
@@ -130,7 +129,7 @@ public class MonkeylandCommand implements CommandExecutor {
 
         double balance = plugin.getBalance(player.getUniqueId(), currency);
         player.sendMessage(ChatColor.GOLD + "Your " + currency + " Balance: " + ChatColor.WHITE + String.format("%.2f", balance));
-    }
+    }*/
 
     private void handleAddCommand(Player player, String[] args) {
         if (!player.hasPermission("monkeylandeconomy.admin")) {
