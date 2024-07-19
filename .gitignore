@@ -4,6 +4,17 @@
 # Log file
 *.log
 
+# Build artifacts
+build/
+
+# IDE files
+.idea/
+*.iml
+
+# Gradle
+.gradle/
+local.properties
+
 # BlueJ files
 *.ctxt
 
