@@ -43,6 +43,9 @@ public class MonkeylandCommand implements CommandExecutor {
             case "exchange":
                 handleExchangeCommand(player, args);
                 break;
+            case "give":
+                handleGiveCommand(player, args);
+                break;
             default:
                 player.sendMessage(ChatColor.RED + "Invalid command. Use /monkeyland for help.");
         }
@@ -54,6 +57,7 @@ public class MonkeylandCommand implements CommandExecutor {
         player.sendMessage(ChatColor.GOLD + "Monkeyland Economy Commands:");
         player.sendMessage(ChatColor.YELLOW + "/monkeyland balance [currency]" + ChatColor.WHITE + " - Check your balances.");
         player.sendMessage(ChatColor.YELLOW + "/monkeyland exchange <fromCurrency> <toCurrency> <amount>" + ChatColor.WHITE + " - Exchange currencies.");
+        player.sendMessage(ChatColor.YELLOW + "/monkeyland give <player> <currency> <amount>" + ChatColor.WHITE + " - Give currency to another player.");
 
         if (player.hasPermission("monkeylandeconomy.admin")) {
             player.sendMessage(ChatColor.YELLOW + "/monkeyland info" + ChatColor.WHITE + " - View economy info.");
@@ -81,17 +85,25 @@ public class MonkeylandCommand implements CommandExecutor {
 
     // Method for handling the /monkeyland balance command
     private void handleBalanceCommand(Player player, String[] args) {
-        MonkeylandEconomy.Currency currency = MonkeylandEconomy.Currency.GOLD;
         if (args.length > 1) {
+            MonkeylandEconomy.Currency currency;
             try {
                 currency = MonkeylandEconomy.Currency.valueOf(args[1].toUpperCase());
             } catch (IllegalArgumentException e) {
                 player.sendMessage(ChatColor.RED + "Invalid currency.");
                 return;
             }
+            double balance = plugin.getBalance(player.getUniqueId(), currency);
+            player.sendMessage(ChatColor.GOLD + "Your " + currency + " Balance: " + ChatColor.WHITE + String.format("%.2f", balance));
+        } else { // No currency specified, show all balances
+            player.sendMessage(ChatColor.GOLD + "Your Balances:");
+            for (MonkeylandEconomy.Currency currency : MonkeylandEconomy.Currency.values()) {
+                double balance = plugin.getBalance(player.getUniqueId(), currency);
+                if (balance > 0) {
+                    player.sendMessage(ChatColor.YELLOW + currency.name() + ": " + ChatColor.WHITE + String.format("%.2f", balance));
+                }
+            }
         }
-        double balance = plugin.getBalance(player.getUniqueId(), currency);
-        player.sendMessage(ChatColor.GOLD + "Your " + currency + " Balance: " + ChatColor.WHITE + String.format("%.2f", balance));
     }
 
     /**
@@ -193,4 +205,57 @@ public class MonkeylandCommand implements CommandExecutor {
 
         plugin.exchangeCurrencyForGold(player, fromCurrency, toCurrency, amount);
     }
+
+    private void handleGiveCommand(Player player, String[] args) {
+        if (args.length != 4) {
+            player.sendMessage(ChatColor.RED + "Usage: /monkeyland give <player> <currency> <amount>");
+            return;
+        }
+
+        Player targetPlayer = Bukkit.getPlayerExact(args[1]);
+        if (targetPlayer == null) {
+            player.sendMessage(ChatColor.RED + "Player not found.");
+            return;
+        }
+
+        MonkeylandEconomy.Currency currency;
+        try {
+            currency = MonkeylandEconomy.Currency.valueOf(args[2].toUpperCase());
+        } catch (IllegalArgumentException e) {
+            player.sendMessage(ChatColor.RED + "Invalid currency.");
+            return;
+        }
+
+        double amount;
+        try {
+            amount = Double.parseDouble(args[3]);
+            if (amount <= 0) {
+                player.sendMessage(ChatColor.RED + "Amount must be positive.");
+                return;
+            }
+        } catch (NumberFormatException e) {
+            player.sendMessage(ChatColor.RED + "Invalid amount.");
+            return;
+        }
+
+        // Security Check 1: Ensure the player has enough balance
+        if (plugin.getBalance(player.getUniqueId(), currency) >= amount) {
+
+            // Security Check 2: Prevent self-payment
+            if (player.getUniqueId().equals(targetPlayer.getUniqueId())) {
+                player.sendMessage(ChatColor.RED + "You cannot give money to yourself.");
+                return;
+            }
+
+            // Transaction using addBalance
+            plugin.addBalance(player.getUniqueId(), currency, -amount);
+            plugin.addBalance(targetPlayer.getUniqueId(), currency, amount);
+
+            player.sendMessage(ChatColor.GREEN + "You gave " + amount + " " + currency + " to " + targetPlayer.getName() + ".");
+            targetPlayer.sendMessage(ChatColor.GREEN + "You received " + amount + " " + currency + " from " + player.getName() + ".");
+        } else {
+            player.sendMessage(ChatColor.RED + "You don't have enough " + currency + ".");
+        }
+    }
+
 }
