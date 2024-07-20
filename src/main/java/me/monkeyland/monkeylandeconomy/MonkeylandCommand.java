@@ -109,7 +109,8 @@ public class MonkeylandCommand implements CommandExecutor {
     /**
      * @deprecated Use the `/monkeyland add` command instead to modify player balances.
      */
-    /* Method for handling the /monkeyland set command
+    // Method for handling the /monkeyland set command
+    @Deprecated
     private void handleSetCommand(Player player, String[] args) {
         if (!player.hasPermission("monkeylandeconomy.admin")) {
             player.sendMessage(ChatColor.RED + "You don't have permission to use this command.");
@@ -141,7 +142,7 @@ public class MonkeylandCommand implements CommandExecutor {
 
         double balance = plugin.getBalance(player.getUniqueId(), currency);
         player.sendMessage(ChatColor.GOLD + "Your " + currency + " Balance: " + ChatColor.WHITE + String.format("%.2f", balance));
-    }*/
+    }
 
     private void handleAddCommand(Player player, String[] args) {
         if (!player.hasPermission("monkeylandeconomy.admin")) {
@@ -171,6 +172,10 @@ public class MonkeylandCommand implements CommandExecutor {
         double amount;
         try {
             amount = Double.parseDouble(args[3]);
+            if (amount <= 0) {
+                player.sendMessage(ChatColor.RED + "Amount must be positive.");
+                return;
+            }
         } catch (NumberFormatException e) {
             player.sendMessage(ChatColor.RED + "Invalid amount.");
             return;
@@ -178,6 +183,7 @@ public class MonkeylandCommand implements CommandExecutor {
 
         plugin.addBalance(targetPlayer.getUniqueId(), currency, amount);
         player.sendMessage(ChatColor.GREEN + "Added " + amount + " " + currency + " to " + targetPlayer.getName() + "'s balance.");
+
     }
 
     private void handleExchangeCommand(Player player, String[] args) {

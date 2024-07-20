@@ -311,18 +311,40 @@ public final class MonkeylandEconomy extends JavaPlugin implements Listener {
         return balances.getOrDefault(currency, 0.0);
     }
 
-    public void setBalance(UUID playerId, Currency currency, double amount) {
+/*    public void setBalance(UUID playerId, Currency currency, double amount) {
         Map<Currency, Double> balances = playerBalances.get(playerId);
         if (balances == null) {
             balances = new HashMap<>();
             playerBalances.put(playerId, balances);
         }
         balances.put(currency, amount);
-        saveEconomyData();
-    }
+    }*/
 
     public void addBalance(UUID playerId, Currency currency, double amount) {
-        setBalance(playerId, currency, getBalance(playerId, currency) + amount);
+        Player player = Bukkit.getPlayer(playerId);
+
+        if (player != null && player.isOnline()) {
+
+            Map<Currency, Double> balances = playerBalances.computeIfAbsent(playerId, k -> new HashMap<>());
+            double currentBalance = balances.getOrDefault(currency, 0.0);
+
+            if (currency == Currency.GOLD) {
+                double newGoldBalance = currentBalance + amount;
+                if (newGoldBalance > maxGoldSupply) {
+                    getLogger().warning("Attempt to add gold to player " + playerId + " would exceed max supply. Transaction cancelled.");
+                    player.sendMessage(ChatColor.RED + "Error: Adding this amount would exceed the maximum gold supply.");
+                    return;
+                }
+            } else {
+                balances.merge(currency, amount, Double::sum);
+            }
+
+            // Update the player's balances
+            playerBalances.put(playerId, balances);
+            saveEconomyData();
+        } else {
+            getLogger().warning("Cannot add balance to offline player: " + playerId);
+        }
     }
 
     @EventHandler
