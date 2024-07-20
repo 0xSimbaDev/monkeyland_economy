@@ -59,6 +59,18 @@ public class PlaceholderAPIHook extends PlaceholderExpansion {
             }
         }
 
-        return null;
+        else {
+            switch (identifier.toLowerCase()) {
+                case "gold_circulating_supply":
+                    return String.format("%.2f", plugin.getCirculatingGoldSupply());
+                case "max_gold_supply":
+                    return String.format("%.2f", plugin.getMaxGoldSupply());
+                case "gold_inflation_rate":
+                    return String.format("%.2f%%", plugin.getGoldInflationRate() * 100);
+                default:
+                    return null;
+            }
+        }
+
     }
 }
